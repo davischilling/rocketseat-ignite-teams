@@ -11,6 +11,6 @@ type Props = {
 export const FormButtonIcon = ({ icon, placeholder }: Props) => (
   <Container>
     <Input placeholder={placeholder} autoCorrect={false} />
-    <ButtonIcon name={icon} />
+    <ButtonIcon icon={icon} />
   </Container>
 );

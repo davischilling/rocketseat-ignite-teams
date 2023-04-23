@@ -9,31 +9,22 @@ import { PlayerCard } from "@components/PlayerCard";
 import { useState } from "react";
 import { FlatList } from "react-native";
 import { Container, HeaderList, NumberOfPlayers } from "./styles";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { RootStackParamList } from "navigation/types";
 
 type Props = {};
 
 export const Players = ({}: Props) => {
   const [team, setTeam] = useState("Time A" as string);
-  const [players, setPlayers] = useState([
-    "Davi",
-    "João",
-    "Maria",
-    "José",
-    "Pedro",
-    "Ana",
-    "Paulo",
-    "Lucas",
-    "Marcos",
-    "Mateus",
-    "Luciana",
-    "Júlia",
-    "Júlio",
-  ]);
+  const [players, setPlayers] = useState(["Davi", "João"]);
+  const {
+    params: {group},
+  } = useRoute<RouteProp<RootStackParamList, "Players">>();
 
   return (
     <Container>
       <Header showBackBtn />
-      <Highlight title="Nome da turma" subtitle="Adicione os jogadores" />
+      <Highlight title={group} subtitle="Adicione os jogadores" />
       <FormButtonIcon icon="add" placeholder="Nome do jogador" />
       <HeaderList>
         <FlatList
@@ -70,7 +61,11 @@ export const Players = ({}: Props) => {
           players.length === 0 && { flex: 1 },
         ]}
       />
-      <Button title="Remover turma" type="SECONDARY" style={{ marginTop: 16 }} />
+      <Button
+        title="Remover turma"
+        type="SECONDARY"
+        style={{ marginTop: 16 }}
+      />
     </Container>
   );
 };

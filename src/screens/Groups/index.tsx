@@ -16,7 +16,7 @@ export const Groups = () => {
   const navigation = useNavigation();
 
   const [groups, setGroups] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const handleNewGroup = () => {
     navigation.navigate("New");

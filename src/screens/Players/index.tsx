@@ -32,7 +32,7 @@ export const Players = ({}: Props) => {
   const [player, setPlayer] = useState("" as string);
   const [team, setTeam] = useState("Time A" as string);
   const [players, setPlayers] = useState<PlayerStorage[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const playerRef = useRef<TextInput>(null);
 

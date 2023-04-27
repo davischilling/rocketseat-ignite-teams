@@ -31,14 +31,14 @@ export const Players = ({}: Props) => {
 
   const [player, setPlayer] = useState("" as string);
   const [team, setTeam] = useState("Time A" as string);
-  const [players, setPlayers] = useState<PlayerStorage[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [groupPlayers, setGroupPlayers] = useState<PlayerStorage[]>([]);
+  const [teamPlayers, setTeamPlayers] = useState<PlayerStorage[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const playerRef = useRef<TextInput>(null);
 
   const handleAddNewPlayer = async () => {
     try {
-      setIsLoading(true);
       if (player.trim().length === 0) {
         setPlayer("");
         throw new AppError("Informe o nome do jogador");
@@ -50,7 +50,8 @@ export const Players = ({}: Props) => {
       await setStoragePlayerByGroup(newPlayer, group);
       playerRef.current?.blur();
       setPlayer("");
-      fetchPlayers();
+      const newGroupPlayers = [...groupPlayers, newPlayer];
+      filterPlayersByTeam(newGroupPlayers);
     } catch (e) {
       if (e instanceof AppError) {
         return Alert.alert("Ops!", e.message);
@@ -58,21 +59,17 @@ export const Players = ({}: Props) => {
         console.log(e);
         return Alert.alert("Ops!", "Ocorreu um erro ao criar um jogador");
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleRemovePlayer = async (player: PlayerStorage) => {
     try {
-      setIsLoading(true);
       await deleteStoragePlayerByGroup(player, group);
-      fetchPlayers();
+      const filteredGroupPlayers = groupPlayers.filter(groupPlayer => groupPlayer.name !== player.name);
+      filterPlayersByTeam(filteredGroupPlayers);
     } catch (e) {
       console.log(e);
       return Alert.alert("Ops!", "Ocorreu um erro ao remover o jogador");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -91,14 +88,11 @@ export const Players = ({}: Props) => {
 
   const groupRemove = async (group: string) => {
     try {
-      setIsLoading(true);
       await deleteStorageGroup(group);
       navigation.navigate("Groups");
     } catch (e) {
       console.log(e);
       return Alert.alert("Ops!", "Ocorreu um erro ao remover o grupo");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -106,8 +100,7 @@ export const Players = ({}: Props) => {
     try {
       setIsLoading(true);
       const data = await getStoragePlayersByGroup(group);
-      const filteredPlayers = data.filter((player) => player.team === team);
-      setPlayers(filteredPlayers);
+      filterPlayersByTeam(data);
     } catch (e) {
       console.log(e);
       return Alert.alert(
@@ -119,8 +112,18 @@ export const Players = ({}: Props) => {
     }
   };
 
+  const filterPlayersByTeam = (groupPlayers: PlayerStorage[]) => {
+    const filteredPlayers = groupPlayers.filter((player) => player.team === team);
+    setGroupPlayers(groupPlayers);
+    setTeamPlayers(filteredPlayers);
+  }
+
   useEffect(() => {
-    fetchPlayers();
+    if (groupPlayers.length === 0) {
+      fetchPlayers();
+    } else {
+      filterPlayersByTeam(groupPlayers);
+    }
   }, [team]);
 
   return (
@@ -149,13 +152,13 @@ export const Players = ({}: Props) => {
           )}
           horizontal
         />
-        <NumberOfPlayers>{players.length}</NumberOfPlayers>
+        <NumberOfPlayers>{teamPlayers.length}</NumberOfPlayers>
       </HeaderList>
       {isLoading ? (
         <Loading />
       ) : (
         <FlatList
-          data={players}
+          data={teamPlayers}
           keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
             <PlayerCard
@@ -171,7 +174,7 @@ export const Players = ({}: Props) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[
             { paddingBottom: 24 },
-            players.length === 0 && { flex: 1 },
+            teamPlayers.length === 0 && { flex: 1 },
           ]}
         />
       )}

@@ -3,7 +3,15 @@ import { Groups } from "@screens/Groups";
 import { NewGroup } from "@screens/NewGroup";
 import { Players } from "@screens/Players";
 
-const { Navigator, Screen } = createNativeStackNavigator();
+export type RootStackParamList = {
+  Groups: undefined;
+  New: undefined;
+  Players: {
+    group: string;
+  };
+};
+
+const { Navigator, Screen } = createNativeStackNavigator<RootStackParamList>();
 
 export const AppRoutes = () => (
   <Navigator screenOptions={{ headerShown: false }}>
